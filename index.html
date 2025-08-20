@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Eats POS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🍽️</div>
+      <div class="brand-text">
+        <h1>Golden Eats POS</h1>
+        <small>Addis Ababa • Oromia • Baale • Dallo-Manna</small>
+      </div>
+    </div>
+    <nav class="tabs" id="navTabs">
+      <button data-page="dashboard" class="active">Dashboard</button>
+      <button data-page="categories">Categories</button>
+      <button data-page="products">Products</button>
+      <button data-page="customers">Customers</button>
+      <button data-page="pos">POS / Invoice</button>
+      <button data-page="orders">Orders</button>
+      <button data-page="settings">Settings</button>
+    </nav>
+  </header>
+
+  <!-- Pages -->
+  <main id="pages">
+
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page visible">
+      <div class="cards">
+        <div class="card"><div class="kpi" id="kpiTodayOrders">0</div><div class="kpi-label">Today’s Orders</div></div>
+        <div class="card"><div class="kpi" id="kpiCategories">0</div><div class="kpi-label">Total Categories</div></div>
+        <div class="card"><div class="kpi" id="kpiProducts">0</div><div class="kpi-label">Total Products</div></div>
+        <div class="card"><div class="kpi" id="kpiCustomers">0</div><div class="kpi-label">Total Customers</div></div>
+      </div>
+      <div class="panel">
+        <h3>Recent Orders</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardRecentOrders"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section id="page-categories" class="page">
+      <div class="panel">
+        <h3>Category Management</h3>
+        <form id="catForm" class="row">
+          <input type="hidden" id="catId" />
+          <input type="text" id="catName" placeholder="Category name" required />
+          <button type="submit">Save</button>
+          <button type="button" id="catReset" class="ghost">Reset</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Actions</th></tr></thead>
+            <tbody id="catRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section id="page-products" class="page">
+      <div class="panel">
+        <h3>Product Management</h3>
+        <form id="prodForm" class="row">
+          <input type="hidden" id="prodId" />
+          <input type="text" id="prodName" placeholder="Product name" required />
+          <select id="prodCategory" required></select>
+          <input type="number" id="prodPrice" placeholder="Price" min="0" step="0.01" required />
+          <label class="file">
+            <input type="file" id="prodImage" accept="image/*" />
+            <span>Upload Image</span>
+          </label>
+          <button type="submit">Save</button>
+          <button type="button" id="prodReset" class="ghost">Reset</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="prodRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Customers -->
+    <section id="page-customers" class="page">
+      <div class="panel">
+        <h3>Customer Management</h3>
+        <form id="custForm" class="row">
+          <input type="hidden" id="custId" />
+          <input type="text" id="custName" placeholder="Customer name" required />
+          <input type="tel" id="custPhone" placeholder="Phone" />
+          <input type="email" id="custEmail" placeholder="Email" />
+          <input type="text" id="custLocation" placeholder="Location" />
+          <button type="submit">Save</button>
+          <button type="button" id="custReset" class="ghost">Reset</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Location</th><th>Actions</th></tr></thead>
+            <tbody id="custRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- POS / Invoice -->
+    <section id="page-pos" class="page">
+      <div class="panel">
+        <h3>Point of Sale — Create Order</h3>
+
+        <div class="row wrap gap">
+          <div class="field grow">
+            <label>Search Product</label>
+            <input id="posSearch" list="productsList" placeholder="Type to search..." />
+            <datalist id="productsList"></datalist>
+          </div>
+          <div class="field">
+            <label>Qty</label>
+            <input id="posQty" type="number" min="1" value="1" />
+          </div>
+          <button id="posAddBtn" class="icon-btn">➕ Add Item</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="cartRows"></tbody>
+            <tfoot>
+              <tr><td colspan="3" class="ta-right"><b>Total</b></td><td id="cartTotal"><b>0.00</b></td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="row wrap gap">
+          <div class="field grow">
+            <label>Customer (Phone to search or add)</label>
+            <input id="orderPhone" placeholder="e.g. 0907453590" />
+          </div>
+          <div class="field grow">
+            <label>Payment Mode</label>
+            <select id="orderPayment">
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Mobile Money">Mobile Money</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row wrap gap">
+          <button id="saveDraftBtn" class="ghost">💾 Auto-Save Now</button>
+          <button id="placeOrderBtn">🧾 Place Order</button>
+          <button id="printBtn" class="outline">🖨️ Print Invoice</button>
+          <button id="viewInvoicesBtn" class="ghost">📚 Invoices</button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice -->
+      <div id="printArea" class="print-area">
+        <div class="invoice">
+          <div class="inv-header">
+            <div>
+              <h2>Golden Eats</h2>
+              <small>Email: goldeneats07@gmsil.com</small><br/>
+              <small>Phone: 0907453590</small><br/>
+              <small>Addis Ababa • Oromia • Baale • Dallo-Manna</small>
+            </div>
+            <div class="inv-meta">
+              <div><b>Invoice:</b> <span id="invNo">—</span></div>
+              <div><b>Date:</b> <span id="invDate">—</span></div>
+              <div><b>Customer:</b> <span id="invCustomer">—</span></div>
+            </div>
+          </div>
+          <table class="inv-table">
+            <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th></tr></thead>
+            <tbody id="invRows"></tbody>
+            <tfoot><tr><td colspan="3" class="ta-right"><b>Total</b></td><td id="invTotal"><b>0.00</b></td></tr></tfoot>
+          </table>
+          <div class="inv-footer">Thank you for your purchase!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section id="page-orders" class="page">
+      <div class="panel">
+        <h3>Orders</h3>
+        <div class="row wrap gap">
+          <input type="date" id="filterFrom" />
+          <input type="date" id="filterTo" />
+          <select id="filterPayment">
+            <option value="">All Payments</option>
+            <option>Cash</option>
+            <option>Card</option>
+            <option>Mobile Money</option>
+          </select>
+          <button id="filterBtn" class="ghost">Filter</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Track #</th><th>Date</th><th>Customer</th>
+                <th>Payment</th><th>Total</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orderRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="page-settings" class="page">
+      <div class="panel">
+        <h3>Business Profile</h3>
+        <form id="bizForm" class="row">
+          <input id="bizName" placeholder="Business Name" value="Golden Eats" />
+          <input id="bizEmail" type="email" placeholder="Email" value="goldeneats07@gmsil.com" />
+          <input id="bizPhone" placeholder="Phone" value="0907453590" />
+          <input id="bizLocation" placeholder="Location" value="Addis Ababa, Oromia, Baale, Dallo-Manna" />
+          <button type="submit">Save Profile</button>
+        </form>
+        <hr/>
+        <div class="row wrap gap">
+          <button id="exportBtn" class="outline">⬇️ Export Data (JSON)</button>
+          <label class="file">
+            <input type="file" id="importFile" accept="application/json" />
+            <span>⬆️ Import Data</span>
+          </label>
+          <button id="wipeBtn" class="danger">🗑️ Wipe Local Data</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <small>© <span id="year"></span> Golden Eats — Simple POS (Offline-first via Local Storage)</small>
+  </footer>
+
+  <!-- Modal (create customer during checkout) -->
+  <dialog id="custModal">
+    <form method="dialog" class="panel">
+      <h3>Create Customer</h3>
+      <input type="text" id="mName" placeholder="Customer name" required />
+      <input type="tel" id="mPhone" placeholder="Phone" />
+      <input type="email" id="mEmail" placeholder="Email" />
+      <input type="text" id="mLocation" placeholder="Location" />
+      <div class="row right gap">
+        <button value="cancel" class="ghost">Cancel</button>
+        <button id="mSave" value="default">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
